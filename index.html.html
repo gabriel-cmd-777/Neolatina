@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f5f0e7">
+<title>NEOLATINA · laboratorio di parole</title>
+<style>
+:root{--paper:#f5f0e7;--ink:#24251f;--muted:#77776b;--line:#d9d1c3;--red:#b94d35;--green:#496b54;--card:#fffdf8;--soft:#e9e1d3}
+*{box-sizing:border-box}html{background:var(--paper)}body{margin:0;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.45}
+button,select,input{font:inherit}button{cursor:pointer}
+.shell{max-width:760px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top)) 17px calc(35px + env(safe-area-inset-bottom))}
+.top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--ink);padding-bottom:15px}
+.brand{font-weight:900;letter-spacing:.14em;font-size:1.05rem}.edition{font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+.intro{padding:28px 0 20px}.eyebrow{color:var(--red);font-size:.72rem;font-weight:800;letter-spacing:.13em;text-transform:uppercase}
+h1{font-family:Georgia,serif;font-weight:500;letter-spacing:-.045em;font-size:clamp(2.6rem,12vw,5rem);line-height:.92;margin:10px 0 15px}
+.intro p{max-width:510px;color:#55564d;margin:0;font-size:1rem}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:17px;margin:15px 0}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px}
+h2{font-size:.78rem;text-transform:uppercase;letter-spacing:.12em;margin:0}
+.small{font-size:.78rem;color:var(--muted)}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:6px}
+select,input{width:100%;min-height:44px;border:1px solid var(--line);background:#fffdf8;border-radius:10px;padding:9px 11px;color:var(--ink)}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.btn{border:1px solid var(--ink);background:var(--ink);color:white;border-radius:999px;padding:11px 16px;font-size:.88rem;font-weight:700}
+.btn.secondary{background:transparent;color:var(--ink)}.btn.light{background:var(--soft);border-color:var(--soft);color:var(--ink)}
+.results-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:27px 2px 10px}
+.results-head h2{font-size:.8rem}.results{display:grid;gap:12px}
+.word-card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:17px}
+.wordline{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.word{font-family:Georgia,serif;font-size:clamp(1.8rem,8vw,2.6rem);line-height:1.05;overflow-wrap:anywhere}
+.kind{color:var(--red);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;font-weight:800;margin-top:6px}
+.definition{font-family:Georgia,serif;font-size:1.06rem;line-height:1.4;margin:13px 0}
+.parts{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.part{background:var(--soft);border-radius:7px;padding:6px 8px;font-size:.77rem}
+.part b{display:block;font-size:.84rem}.part span{color:#626257}
+.status{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;font-weight:800;color:var(--green)}
+.note{font-size:.8rem;color:#66665c;margin:8px 0 0}
+.card-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.mini{border:1px solid var(--line);border-radius:999px;background:transparent;padding:8px 12px;font-size:.78rem;color:var(--ink)}
+.mini.saved{background:#e2ecdf;border-color:#cbdcc7}
+.tabs{display:flex;gap:8px;margin:25px 0 12px}
+.tab{border:1px solid var(--line);border-radius:999px;padding:9px 14px;background:transparent;color:var(--ink);font-size:.85rem}
+.tab.active{background:var(--ink);border-color:var(--ink);color:#fff}
+.saved-list{display:grid;gap:10px}.empty{border:1px dashed var(--line);border-radius:14px;padding:24px;text-align:center;color:var(--muted);font-size:.9rem}
+.saved-item{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--line);background:var(--card);border-radius:13px;padding:13px}
+.saved-item strong{font-family:Georgia,serif;font-size:1.25rem;font-weight:500}.saved-item p{font-size:.78rem;color:var(--muted);margin:3px 0 0}
+footer{border-top:1px solid var(--line);margin-top:28px;padding-top:15px;font-size:.75rem;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:white;border-radius:999px;padding:11px 16px;font-size:.85rem;box-shadow:0 5px 25px #0002;z-index:5;max-width:90vw;text-align:center}
+.hidden{display:none!important}
+@media(min-width:620px){.shell{padding-left:25px;padding-right:25px}.results{grid-template-columns:1fr 1fr}.word-card:first-child{grid-column:span 2}.word-card:first-child .word{font-size:3rem}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="top"><div class="brand">NEOLATINA</div><div class="edition">Officina lessicale · N. 001</div></header>
+  <section class="intro">
+    <div class="eyebrow">Latino in entrata, italiano in uscita</div>
+    <h1>Parole che<br>non esistono.</h1>
+    <p>Mescola radici latine, sillabe e terminazioni. Ogni risultato ha una forma inventata, una genealogia dichiarata e una definizione tutta da discutere.</p>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>Regola di fabbricazione</h2><span class="small">v. 1.0</span></div>
+    <div class="controls">
+      <div><label for="count">Proposte per volta</label><select id="count"><option value="4">4 parole</option><option value="6" selected>6 parole</option><option value="8">8 parole</option><option value="10">10 parole</option></select></div>
+      <div><label for="tone">Forma preferita</label><select id="tone"><option value="mix">Italianissima · libera</option><option value="nome">Sostantivi</option><option value="aggettivo">Aggettivi</option><option value="verbo">Verbi</option></select></div>
+    </div>
+    <div class="actions">
+      <button class="btn" id="generate">✳ Genera parole</button>
+      <button class="btn secondary" id="export">Esporta salvate .txt</button>
+    </div>
+    <p class="small">Le combinazioni vengono create sul dispositivo. Nessuna connessione, account o servizio esterno.</p>
+  </section>
+
+  <div class="results-head"><h2 id="resultsTitle">Le nuove nate</h2><span class="small" id="resultCount">6 proposte</span></div>
+  <section class="results" id="results" aria-live="polite"></section>
+
+  <div class="tabs"><button class="tab active" data-tab="saved">Archivio <span id="savedCount">0</span></button><button class="tab" data-tab="method">Come funziona</button></div>
+  <section id="savedView" class="saved-list"></section>
+  <section id="methodView" class="panel hidden">
+    <h2>Una genealogia onesta</h2>
+    <p class="note">I segmenti e i significati latini provengono da un repertorio interno ridotto e curato. La parola risultante e la sua definizione sono invenzioni creative, non etimologie storiche.</p>
+    <p class="note"><b>Radice:</b> segmento riconducibile a una parola latina. <b>Giuntura:</b> eventuale vocale inserita per rendere la forma più pronunciabile. <b>Terminazione:</b> finale scelta per evocare una forma italiana.</p>
+    <p class="note">Il repertorio è volutamente piccolo. Una somiglianza sonora non dimostra una parentela etimologica, e le parole generate non vengono dichiarate “inesistenti” in senso assoluto senza un controllo lessicografico.</p>
+  </section>
+  <footer>NEOLATINA è un laboratorio di invenzione, non un dizionario etimologico. I dati salvati restano nel browser di questo dispositivo.</footer>
+</div>
+<div id="toast" class="toast hidden" role="status"></div>
+<script>
+(() => {
+'use strict';
+const $ = s => document.querySelector(s);
+const latin = [
+ {w:'ludus',root:'lud',meaning:'gioco',syll:'lu',type:'azione'},
+ {w:'caelum',root:'cael',meaning:'cielo',syll:'ce',type:'luogo'},
+ {w:'mordere',root:'mord',meaning:'mordere',syll:'mor',type:'azione'},
+ {w:'lentus',root:'lent',meaning:'lento, flessibile',syll:'len',type:'qualità'},
+ {w:'verbum',root:'verb',meaning:'parola',syll:'ver',type:'linguaggio'},
+ {w:'somnus',root:'somn',meaning:'sonno',syll:'som',type:'stato'},
+ {w:'fatum',root:'fat',meaning:'destino, ciò che è detto',syll:'fa',type:'destino'},
+ {w:'umbra',root:'umbr',meaning:'ombra',syll:'um',type:'presenza'},
+ {w:'flumen',root:'fluv',meaning:'fiume, corso d’acqua',syll:'flu',type:'movimento'},
+ {w:'cor',root:'cord',meaning:'cuore',syll:'cor',type:'sentimento'},
+ {w:'memoria',root:'memor',meaning:'memoria',syll:'me',type:'ricordo'},
+ {w:'oculus',root:'ocul',meaning:'occhio',syll:'oc',type:'sguardo'},
+ {w:'silentium',root:'sil',meaning:'silenzio',syll:'si',type:'assenza'},
+ {w:'via',root:'vi',meaning:'via, strada',syll:'vi',type:'percorso'},
+ {w:'ferrum',root:'ferr',meaning:'ferro',syll:'fer',type:'materia'},
+ {w:'ventus',root:'vent',meaning:'vento',syll:'ven',type:'movimento'},
+ {w:'cibus',root:'cib',meaning:'cibo',syll:'ci',type:'nutrimento'},
+ {w:'cura',root:'cur',meaning:'cura, preoccupazione',syll:'cu',type:'attenzione'},
+ {w:'facere',root:'fac',meaning:'fare',syll:'fa',type:'azione'},
+ {w:'vertere',root:'vert',meaning:'voltare, trasformare',syll:'ver',type:'cambiamento'},
+ {w:'ridere',root:'rid',meaning:'ridere',syll:'ri',type:'reazione'},
+ {w:'tenebrae',root:'tenebr',meaning:'tenebre',syll:'te',type:'oscurità'},
+ {w:'aqua',root:'aqu',meaning:'acqua',syll:'ac',type:'materia'},
+ {w:'novus',root:'nov',meaning:'nuovo',syll:'no',type:'novità'},
+ {w:'ars',root:'art',meaning:'arte, tecnica',syll:'ar',type:'abilità'},
+ {w:'dubium',root:'dubi',meaning:'dubbio',syll:'du',type:'incertezza'},
+ {w:'sapor',root:'sapor',meaning:'sapore',syll:'sa',type:'sensazione'},
+ {w:'nomen',root:'nomin',meaning:'nome',syll:'no',type:'identità'},
+ {w:'vincere',root:'vinc',meaning:'vincere',syll:'vin',type:'conflitto'},
+ {w:'cadere',root:'cad',meaning:'cadere',syll:'ca',type:'perdita'},
+ {w:'timor',root:'tim',meaning:'paura',syll:'ti',type:'emozione'},
+ {w:'spes',root:'sper',meaning:'speranza',syll:'spe',type:'attesa'},
+ {w:'orbis',root:'orb',meaning:'cerchio, mondo',syll:'or',type:'forma'},
+ {w:'mens',root:'ment',meaning:'mente',syll:'men',type:'pensiero'}
+];
+const endings = {
+ nome:['anza','ezza','ura','orio','ame','esco','etto','ismo','aglia','ume','enza','ìo','ario','eria','one','iglia','astro','enza'],
+ aggettivo:['oso','ivo','esco','abile','ile','uto','ante','igno','evole','esco','ardo','ale'],
+ verbo:['are','ire','eggiare','olare','icare','ucchiare','ettare']
+};
+const defs = {
+ azione:['l’abitudine di {v} senza accorgersi che si sta facendo altro.','un gesto che comincia per necessità e finisce per diventare una regola.','la capacità di {v} proprio quando non serve.'],
+ luogo:['il posto mentale in cui si depositano le cose rimandate.','un luogo che compare soltanto quando qualcuno lo descrive male.','la stanza invisibile tra una decisione e la sua esecuzione.'],
+ qualità:['che sembra {v}, ma soltanto nelle occasioni ufficiali.','capace di rendere complicata la cosa più semplice.','detto di una persona che ha già dimenticato il motivo della propria fretta.'],
+ linguaggio:['una parola usata per evitare la parola giusta.','il modo in cui una frase nasconde di aver cambiato argomento.','un’espressione che significa il contrario soltanto dopo essere stata pronunciata.'],
+ stato:['la condizione di chi aspetta qualcosa senza sapere che cosa.','un riposo così attivo da richiedere una pausa.','il momento in cui il pensiero si mette in modalità risparmio.'],
+ destino:['una conseguenza che arriva prima della propria causa.','la previsione formulata dopo che tutto è successo.','un obbligo che si presenta travestito da coincidenza.'],
+ presenza:['qualcosa che manca con una precisione quasi amministrativa.','la presenza che si nota soltanto quando viene conteggiata.','un’assenza che pretende di essere messa a verbale.'],
+ movimento:['un percorso che avanza senza spostare nessuno.','il moto di chi cambia idea restando nello stesso punto.','un movimento interrotto per chiedere dove stava andando.'],
+ sentimento:['un’emozione che arriva con la ricevuta di un’altra.','la sensazione di avere ragione per una ragione sbagliata.','un affetto che si manifesta sotto forma di correzione.'],
+ ricordo:['un ricordo che modifica i fatti per rendere più ordinata la memoria.','la parte del passato che si presenta senza essere stata invitata.','un dettaglio dimenticato che pretende di essere il protagonista.'],
+ sguardo:['il modo di vedere ciò che si è già deciso di non notare.','uno sguardo che mette a fuoco soltanto le eccezioni.','la vista provvisoria di una certezza.'],
+ assenza:['un silenzio che continua a rispondere.','la pausa che si prende il discorso quando non vuole confessare.','la mancanza ufficiale di una cosa mai richiesta.'],
+ percorso:['una strada che si allunga ogni volta che viene spiegata.','il tragitto compiuto da una scusa prima di diventare una decisione.','una deviazione che si dichiara meta a metà del viaggio.'],
+ materia:['un oggetto che acquista peso quando viene nominato.','la sostanza di cui sono fatti gli impegni dimenticati.','un materiale che si lascia usare soltanto per scopi sbagliati.'],
+ nutrimento:['ciò che si consuma per alimentare una preoccupazione.','un pasto immaginario che sazia soprattutto chi lo racconta.','la razione quotidiana di una convinzione.'],
+ attenzione:['la cura riservata a un problema per evitare quello vicino.','un pensiero che resta in piedi mentre tutto il resto si distrae.','l’atto di sorvegliare una cosa fino a farla sparire.'],
+ cambiamento:['la trasformazione che lascia tutto com’era, ma con un nome nuovo.','il passaggio da un errore a una sua versione più elegante.','una svolta che si verifica soltanto nella spiegazione.'],
+ reazione:['una risata che arriva per una ragione diversa da quella prevista.','la risposta automatica a una domanda che nessuno ha fatto.','un riflesso che si considera un’opinione.'],
+ oscurità:['la parte non illuminata di una spiegazione troppo sicura.','un buio che si accende quando qualcuno pretende chiarezza.','la condizione di un fatto prima che venga semplificato.'],
+ novità:['una cosa vecchia che ha cambiato intestazione.','la sorpresa di trovare ancora qualcosa che si era già perso.','un’invenzione che ricorda vagamente un’abitudine.'],
+ incertezza:['il dubbio che sopravvive anche alla soluzione corretta.','una decisione che si tiene aperta per non doverla prendere.','la certezza temporanea di non aver capito.'],
+ sensazione:['un’impressione che si comporta come una prova.','la percezione di qualcosa che non è ancora successo, ma insiste.','un sapore mentale lasciato da una conversazione.'],
+ identità:['il nome provvisorio dato a una persona mentre cambia idea.','la qualità di essere riconoscibili soltanto agli estranei.','una definizione di sé che richiede continue rettifiche.'],
+ conflitto:['una gara in cui entrambi i contendenti vogliono perdere per primi.','la disputa tra ciò che si voleva dire e ciò che si è detto.','un contrasto che si risolve cambiando il significato delle regole.'],
+ perdita:['il modo in cui una cosa scompare lasciando istruzioni.','una mancanza che si presenta come un miglioramento.','la sparizione di un oggetto che non era ancora stato trovato.'],
+ emozione:['una paura che si è messa in ordine alfabetico.','un sentimento che arriva in ritardo e reclama il posto davanti.','la reazione privata a un fatto mai accaduto.'],
+ attesa:['il tempo trascorso a prepararsi a un evento che cambia data.','una speranza che ha imparato a stare in fila.','il rinvio che si spaccia per preparazione.'],
+ forma:['un confine che cambia secondo chi lo deve rispettare.','la geometria assunta da una scusa quando viene ripetuta.','una figura che esiste soltanto nella descrizione.'],
+ pensiero:['un’idea che si traveste da conclusione.','il lavoro mentale necessario per evitare una risposta breve.','una convinzione che si è dimenticata di essere un’ipotesi.'],
+ abilità:['la tecnica di riuscire in una cosa senza saper spiegare come.','una competenza dimostrata soprattutto quando nessuno la chiede.','l’arte di trasformare un imprevisto in metodo.']
+};
+const genericDefs = ['una piccola disfunzione dell’esperienza quotidiana.','il nome di un’abitudine che nessuno ammette di avere.','una cosa che diventa comprensibile soltanto dopo averla spiegata male.','il punto esatto in cui una buona intenzione cambia mestiere.','un fenomeno comune che non ha ancora trovato il proprio modulo.'];
+const savedKey = 'neolatina_saved_v1';
+let current = [];
+let saved = loadSaved();
+let toastTimer;
+function loadSaved(){try{const v=JSON.parse(localStorage.getItem(savedKey)||'[]');return Array.isArray(v)?v:[]}catch(e){return []}}
+function persist(){try{localStorage.setItem(savedKey,JSON.stringify(saved));}catch(e){notify('Memoria locale non disponibile in questo browser.');}}
+function notify(msg){const t=$('#toast');t.textContent=msg;t.classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.add('hidden'),2200)}
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)]}
+function cleanRoot(s){return s.replace(/ae/g,'e').replace(/ph/g,'f').replace(/th/g,'t').replace(/y/g,'i').replace(/x/g,'ss')}
+function vowelEnd(s){return /[aeiouàèéìòóù]$/i.test(s)}
+function makeWord(a,b,end,mode){
+ let r1=a.root, r2=b.root;
+ let chunk1=pick([r1,a.syll, r1.slice(0,Math.max(2,Math.ceil(r1.length*.65)))]);
+ let chunk2=pick([b.syll, r2.slice(Math.max(0,r2.length-3)), r2]);
+ // In the free mode a fragment from the second Latin item is fused with a first root.
+ let base=chunk1;
+ if(Math.random()<.72){
+   if(vowelEnd(base) && /^[aeiou]/.test(chunk2)) chunk2=chunk2.slice(1);
+   if(base.slice(-1)===chunk2[0]) chunk2=chunk2.slice(1);
+   base+=chunk2;
+ }
+ if(end==='are'||end==='ire'||end==='eggiare'||end==='olare'||end==='icare'||end==='ucchiare'||end==='ettare'){
+   base=base.replace(/(are|ere|ire)$/,''); 
+ } else if(/^[aeiou]/.test(end)&&vowelEnd(base)){
+   base=base.slice(0,-1);
+ }
+ let word=cleanRoot(base+end).toLowerCase();
+ word=word.replace(/([bcdfghjklmnpqrstvwxyz])\1{2,}/g,'$1$1');
+ word=word.replace(/([aeiou])\1{2,}/g,'$1$1');
+ // Avoid awkward consonant clusters with a light vowel.
+ word=word.replace(/([bcdfghjklmnpqrstvwxyz]{3})/g, '$1');
+ if(word.length<5) word+=pick(['ello','anza','ivo']);
+ if(!/^[a-zàèéìòóù]+$/i.test(word)) return makeWord(a,b,end,mode);
+ return word.charAt(0).toUpperCase()+word.slice(1);
+}
+function wordKind(end){if(['are','ire','eggiare','olare','icare','ucchiare','ettare'].includes(end))return 'verbo';if(['oso','ivo','esco','abile','ile','uto','ante','igno','evole','ardo','ale'].includes(end))return 'aggettivo';return 'sostantivo'}
+function definition(a,b,kind){
+ const keys=[a.type,b.type].filter(k=>defs[k]);
+ const source=pick(keys.length?keys:Object.keys(defs));
+ let d=pick(defs[source]||genericDefs);
+ d=d.replaceAll('{v}',pick(['agire','aspettare','insistere','sparire','ricominciare']));
+ if(kind==='aggettivo') d='Detto di ciò che è '+d.replace(/^una |^un |^il |^la /,'');
+ if(kind==='verbo') d='Compiere l’azione di '+d.replace(/[.]+$/,'');
+ return d;
+}
+function createOne(used,forcedMode){
+ let a,b,end,word,kind,tries=0;
+ const tone=$('#tone').value;
+ do{
+  a=pick(latin);b=pick(latin.filter(x=>x!==a));
+  const ends=tone==='mix'?Object.values(endings).flat():endings[tone];
+  end=pick(ends);kind=wordKind(end);word=makeWord(a,b,end,tone);tries++;
+ }while((used.has(word.toLowerCase()) || latin.some(x=>x.w.toLowerCase()===word.toLowerCase()) || word.length>13) && tries<80);
+ used.add(word.toLowerCase());
+ const bridge=(vowelEnd(a.root)&&/^[aeiou]/.test(b.syll))?'vocale di raccordo eliminata':'fusione diretta';
+ return {id:Date.now().toString(36)+Math.random().toString(36).slice(2,8),word,kind,definition:definition(a,b,kind),a:{word:a.w,root:a.root,meaning:a.meaning},b:{word:b.w,root:b.root,meaning:b.meaning},ending:end,bridge,created:new Date().toISOString(),status:'INVENZIONE'};
+}
+function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function renderCard(item){
+ const isSaved=saved.some(s=>s.word===item.word && s.definition===item.definition);
+ return `<article class="word-card">
+  <div class="wordline"><div><div class="word">${escapeHTML(item.word)}</div><div class="kind">${escapeHTML(item.kind)}</div></div><span class="status">✳ ${item.status}</span></div>
+  <p class="definition">${escapeHTML(item.definition)}</p>
+  <div class="parts">
+   <div class="part"><b>${escapeHTML(item.a.root)}</b><span>da ${escapeHTML(item.a.word)} · ${escapeHTML(item.a.meaning)}</span></div>
+   <div class="part"><b>${escapeHTML(item.b.root)}</b><span>da ${escapeHTML(item.b.word)} · ${escapeHTML(item.b.meaning)}</span></div>
+   <div class="part"><b>-${escapeHTML(item.ending)}</b><span>terminazione italiana evocata</span></div>
+  </div>
+  <div class="note">Scomposizione creativa, non etimologia storica. I segmenti richiamano parole latine reali; la forma finale e la definizione sono inventate.</div>
+  <div class="card-actions"><button class="mini ${isSaved?'saved':''}" data-action="save" data-id="${escapeHTML(item.id)}">${isSaved?'✓ Salvata':'＋ Salva'}</button><button class="mini" data-action="copy" data-id="${escapeHTML(item.id)}">Copia scheda</button><button class="mini" data-action="again" data-id="${escapeHTML(item.id)}">Nuova definizione</button></div>
+ </article>`;
+}
+function renderResults(){ $('#results').innerHTML=current.map(renderCard).join('');$('#resultCount').textContent=current.length+' proposte';}
+function renderSaved(){
+ $('#savedCount').textContent=saved.length;
+ if(!saved.length){$('#savedView').innerHTML='<div class="empty">L’archivio è ancora vuoto.<br>Salva una parola per ritrovarla qui.</div>';return}
+ $('#savedView').innerHTML=saved.slice().reverse().map((x)=>`<div class="saved-item"><div><strong>${escapeHTML(x.word)}</strong><p>${escapeHTML(x.kind)} · ${escapeHTML(x.definition)}</p></div><div class="card-actions"><button class="mini" data-action="copySaved" data-id="${escapeHTML(x.id)}">Copia</button><button class="mini" data-action="delete" data-id="${escapeHTML(x.id)}">×</button></div></div>`).join('');
+}
+function generate(){const used=new Set(current.map(x=>x.word.toLowerCase()));const n=Number($('#count').value);current=Array.from({length:n},()=>createOne(used));renderResults();$('#resultsTitle').textContent='Le nuove nate';}
+function findCurrent(id){return current.find(x=>x.id===id)}
+function findSaved(id){return saved.find(x=>x.id===id)}
+function sheet(x){return `${x.word} (${x.kind})\n${x.definition}\n\nSegmenti latini:\n- ${x.a.root}, da ${x.a.word}: ${x.a.meaning}\n- ${x.b.root}, da ${x.b.word}: ${x.b.meaning}\n- -${x.ending}: terminazione evocata\n\nNota: forma e definizione sono invenzioni creative, non etimologia storica.`}
+async function copyText(text){try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text)}else{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');ta.remove();if(!ok)throw Error('copy');}notify('Copiato negli appunti.')}catch(e){notify('Copia non riuscita: seleziona e copia il testo manualmente.');}}
+$('#generate').addEventListener('click',generate);
+$('#export').addEventListener('click',()=>{
+ if(!saved.length){notify('Non hai ancora salvato parole.');return}
+ const blob=new Blob([saved.map(sheet).join('\n\n'+'─'.repeat(30)+'\n\n')],{type:'text/plain;charset=utf-8'});
+ const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='neolatina-archivio.txt';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);notify('Archivio esportato.');
+});
+$('#results').addEventListener('click',async e=>{
+ const btn=e.target.closest('button[data-action]');if(!btn)return;
+ const id=btn.dataset.id, action=btn.dataset.action;let x=findCurrent(id);
+ if(action==='save'&&x){
+  const existing=saved.find(s=>s.word===x.word&&s.definition===x.definition);
+  if(existing){saved=saved.filter(s=>s!==existing);notify('Rimossa dall’archivio.')}
+  else{saved.push({...x,id:'s'+Date.now().toString(36)+Math.random().toString(36).slice(2,5)});notify('Parola salvata sul dispositivo.')}
+  persist();renderResults();renderSaved();
+ }else if(action==='copy'&&x)await copyText(sheet(x));
+ else if(action==='again'&&x){x.definition=definition(latin.find(y=>y.w===x.a.word)||pick(latin),latin.find(y=>y.w===x.b.word)||pick(latin),x.kind);renderResults();}
+});
+$('#savedView').addEventListener('click',async e=>{
+ const btn=e.target.closest('button[data-action]');if(!btn)return;
+ const x=findSaved(btn.dataset.id);if(!x)return;
+ if(btn.dataset.action==='copy')await copyText(sheet(x));
+ if(btn.dataset.action==='delete'){saved=saved.filter(s=>s.id!==x.id);persist();renderSaved();notify('Parola eliminata.');}
+});
+document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>{
+ document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b===btn));
+ $('#savedView').classList.toggle('hidden',btn.dataset.tab!=='saved');
+ $('#methodView').classList.toggle('hidden',btn.dataset.tab!=='method');
+}));
+generate();renderSaved();
+})();
+</script>
+</body>
+</html>
